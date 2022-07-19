@@ -1,8 +1,8 @@
+import 'dart:developer';
+
 import 'package:terra_flutter_bridge/terra_flutter_bridge.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
-
-import 'package:flutter/services.dart';
 
 void main() {
   runApp(const MyApp());
@@ -33,21 +33,47 @@ class _MyAppState extends State<MyApp> {
     bool connected = false;
     bool daily = false;
     String testText;
+    Connection c = Connection.appleHealth;
     // Function messages may fail, so we use a try/catch Exception.
     // We also handle the message potentially returning null.
     // USE YOUR OWN CATCH BLOCKS
     // HAVING ALL FUNCTIONS IN THE SAME CATCH IS NOT A GOOD IDEA
     try {
-      testText = await TerraFlutter.testFunction("Custom parameter") ??
+      testText = await TerraFlutter.testFunction(
+              "Awaiting init functions before pulling user ID") ??
           "Some function call went wrong";
-      initialised = await TerraFlutter.initTerra("dev ID", "x API KEY",
-              "JaafarGoogle", 60, ["SAMSUNG"], ["BODY", "DAILY", "ACTIVITY"]) ??
+      initialised = await TerraFlutter.initTerra(
+              "testingTerra", "refID", 60, 60, 60, 60, 60) ??
           false;
-      // connected = await TerraFlutter.checkAuth("GOOGLE_FIT") ?? false;
+
+      connected = await TerraFlutter.initConnection(c, "token", true, [
+            Permission.activity,
+            Permission.daily,
+            Permission.sleep,
+            Permission.nutrition,
+            Permission.athlete,
+            Permission.body
+          ], []) ??
+          false;
+      testText = await TerraFlutter.getUserId(c) ?? "1234";
       daily = await TerraFlutter.getDaily(
-              "SAMSUNG", DateTime.utc(2022, 1, 1), DateTime.utc(2022, 1, 10)) ??
+              c, DateTime.utc(2022, 1, 1), DateTime.utc(2022, 1, 2)) ??
           false;
-    } on Exception {
+      daily = await TerraFlutter.getAthlete(c) ?? false;
+      daily = await TerraFlutter.getBody(
+              c, DateTime.utc(2022, 1, 1), DateTime.utc(2022, 1, 2)) ??
+          false;
+      daily = await TerraFlutter.getNutrition(
+              c, DateTime.utc(2022, 1, 1), DateTime.utc(2022, 1, 2)) ??
+          false;
+      daily = await TerraFlutter.getSleep(
+              c, DateTime.utc(2022, 1, 1), DateTime.utc(2022, 1, 2)) ??
+          false;
+      daily = await TerraFlutter.getActivity(
+              c, DateTime.utc(2022, 1, 1), DateTime.utc(2022, 1, 2)) ??
+          false;
+    } on Exception catch (e) {
+      // print('error caught: $e');
       testText = "Some exception went wrong";
       initialised = false;
       connected = false;
@@ -78,7 +104,7 @@ class _MyAppState extends State<MyApp> {
           child: Column(
             children: [
               Text(
-                'Custom text test: $_testText\n',
+                'User id: $_testText\n',
                 textAlign: TextAlign.center,
               ),
               Text(
