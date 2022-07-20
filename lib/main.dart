@@ -4,6 +4,8 @@ import 'package:terra_flutter_bridge/terra_flutter_bridge.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
+import 'terra_auth_screen.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -96,31 +98,66 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app for Terra SDKs'),
-        ),
-        body: Center(
-          child: Column(
-            children: [
-              Text(
-                'User id: $_testText\n',
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                'Did integration init: $_initialised\n',
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                'Is integration connected: $_connected\n',
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                'Requested daily webhook for integration: $_daily\n',
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
+      home: HomePage(
+          testText: _testText,
+          initialised: _initialised,
+          connected: _connected,
+          daily: _daily),
+      // routes: {
+      //   "/terrasetting": (_) => const TerraAuthScreen(
+      //         navUrl: "https://google.com/",
+      //       )
+      // },
+    );
+  }
+}
+
+class HomePage extends StatelessWidget {
+  final String testText;
+  final bool initialised;
+  final bool connected;
+  final bool daily;
+
+  const HomePage(
+      {Key? key,
+      required this.testText,
+      required this.initialised,
+      required this.connected,
+      required this.daily})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Plugin example app for Terra SDKs'),
+      ),
+      body: Center(
+        child: Column(
+          children: [
+            Text(
+              'User id: $testText\n',
+              textAlign: TextAlign.center,
+            ),
+            Text(
+              'Did integration init: $initialised\n',
+              textAlign: TextAlign.center,
+            ),
+            Text(
+              'Is integration connected: $connected\n',
+              textAlign: TextAlign.center,
+            ),
+            Text(
+              'Requested daily webhook for integration: $daily\n',
+              textAlign: TextAlign.center,
+            ),
+            RaisedButton(
+              child: Text("Terra"),
+              onPressed: () {
+                Navigator.pushNamed(context, "/terrasetting");
+              },
+            )
+          ],
         ),
       ),
     );
